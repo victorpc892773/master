@@ -4,6 +4,6 @@ var POPUP_ATIVO = true;
 
     var s = document.createElement('script');
     s.setAttribute('data-cfasync', 'false');
-    s.src = '//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1167915';
+    s.src = '//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1168594';
     document.head.appendChild(s);
 })();
