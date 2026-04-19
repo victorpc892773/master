@@ -1,10 +1,9 @@
-var ATIVO = true; // false or true
+var POPUP_ATIVO = true;
+(function() {
+    if (!POPUP_ATIVO) return;
 
-(function(){
-  if(!ATIVO) return;
-  var z=['5888865','7514922','7514919'],s=document.createElement('script');
-  s.dataset.zone=z[Math.random()*3|0];
-  s.src='https://llvpn.com/tag.min.js';
-  console.log('[AdZone]',s.dataset.zone);
-  (document.body||document.documentElement).appendChild(s);
+    var s = document.createElement('script');
+    s.setAttribute('data-cfasync', 'false');
+    s.src = '//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1167915';
+    document.head.appendChild(s);
 })();
