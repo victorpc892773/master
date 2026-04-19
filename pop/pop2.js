@@ -1,24 +1,10 @@
-var POPUP_ATIVO = true;
-(function() {
-    var titulo = document.title || 'Sem título';
-    var url = window.location.href;
+var ATIVO = true; // false or true
 
-    if (!POPUP_ATIVO) {
-        console.log('%c[POPUP - PRINCIPAL] ❌ Desligado | Página: ' + titulo, 'color: orange; font-weight: bold;');
-        return;
-    }
-
-    var s = document.createElement('script');
-    s.setAttribute('data-cfasync', 'false');
-    s.src = '//dcbbwymp1bhlf.cloudfront.net/?wbbcd=1168594';
-
-    s.onload = function() {
-        console.log('%c[POPUP - PRINCIPAL] ✅ Carregado! | Página: ' + titulo + ' | URL: ' + url, 'color: green; font-weight: bold;');
-    };
-
-    s.onerror = function() {
-        console.log('%c[POPUP - PRINCIPAL] ❌ Erro ao carregar | Página: ' + titulo, 'color: red; font-weight: bold;');
-    };
-
-    document.head.appendChild(s);
+(function(){
+  if(!ATIVO) return;
+  var z=['5888865','7514922','7514919'],s=document.createElement('script');
+  s.dataset.zone=z[Math.random()*3|0];
+  s.src='https://llvpn.com/tag.min.js';
+  console.log('[AdZone]',s.dataset.zone);
+  (document.body||document.documentElement).appendChild(s);
 })();
