@@ -1,14 +1,12 @@
 (function () {
   var ENABLED = true;
-  var URL_POP = "https://www.profitablecpmratenetwork.com/enr63z73?key=670042a3760e98ee818c2add5affbf67";
+  var URL_POP = "https://crn77.com/4/8868046";
   var pageTitle = document.title || window.location.href;
 
-  // Verifica se está em iframe E se o pai é do mesmo site
   var isIframe = window.self !== window.top;
   var isSameOrigin = false;
   if (isIframe) {
     try {
-      // Se conseguir acessar o parent.location, é mesmo domínio
       var _ = window.parent.location.href;
       isSameOrigin = true;
     } catch (e) {
@@ -17,60 +15,99 @@
   }
 
   if (ENABLED) {
-    console.log("%c[Pop] ✅ Ativado | Página: " + pageTitle + " | iframe: " + isIframe + " | mesmo site: " + isSameOrigin, "color: green; font-weight: bold;");
+    console.log(
+      "%c[Pop] ✅ Ativado | Página: " + pageTitle + " | iframe: " + isIframe + " | mesmo site: " + isSameOrigin,
+      "color: green; font-weight: bold;"
+    );
   } else {
     console.log("%c[Pop] ❌ Desativado | Página: " + pageTitle, "color: red; font-weight: bold;");
   }
 
   var popupLoaded = false;
-  var waitingForParent = false;
+  var waitingForRoot = false;
+
+  // Encontra o topo acessível (mesmo origin) da cadeia de iframes
+  function getRoot() {
+    var root = window;
+    try {
+      while (root.parent && root.parent !== root) {
+        var _ = root.parent.location.href; // lança se cross-origin
+        root = root.parent;
+      }
+    } catch (e) {
+      // parou no limite cross-origin, root é o mais alto acessível
+    }
+    return root;
+  }
 
   function openPop() {
     if (!ENABLED || popupLoaded) return;
     popupLoaded = true;
 
     if (isIframe && isSameOrigin) {
-      // Mesmo site: espera o pai disparar primeiro, depois abre o seu
-      waitingForParent = true;
-      console.log("%c[Pop] ⏳ Aguardando pop pai... | " + pageTitle, "color: orange; font-weight: bold;");
-      window.parent.postMessage({ type: 'pop_filho_aguardando', url: URL_POP }, '*');
+      // Envia para o topo acessível coordenar a sequência
+      waitingForRoot = true;
+      console.log("%c[Pop] ⏳ Aguardando root... | " + pageTitle, "color: orange; font-weight: bold;");
+      var root = getRoot();
+      root.postMessage({ type: 'pop_register', url: URL_POP, title: pageTitle }, '*');
     } else {
-      // Iframe cross-origin ou página principal: abre normalmente
+      // Cross-origin ou já é o topo: abre direto
       window.open(URL_POP, "_blank");
-      console.log("%c[Pop] 🚀 Disparado | " + pageTitle, "color: cyan; font-weight: bold;");
+      console.log("%c[Pop] 🚀 Disparado direto | " + pageTitle, "color: cyan; font-weight: bold;");
     }
 
     setTimeout(() => {
       popupLoaded = false;
-      waitingForParent = false;
+      waitingForRoot = false;
       document.addEventListener('mousedown', openPop, { once: true });
       document.addEventListener('touchstart', openPop, { once: true, passive: true });
     }, 15000);
   }
 
-  // Página pai: escuta o filho e após abrir o próprio, libera o filho
-  if (!isIframe) {
-    window.addEventListener('message', function (e) {
-      if (e.data && e.data.type === 'pop_filho_aguardando') {
-        // Pai já abriu o seu, agora manda sinal para o filho abrir
-        setTimeout(function () {
-          e.source.postMessage({ type: 'pop_pai_disparado', url: e.data.url }, '*');
-          console.log("%c[Pop] 📨 Sinal enviado ao filho", "color: purple; font-weight: bold;");
-        }, 500); // 500ms de delay entre os dois pops
+  // Coordenador: roda no topo da cadeia same-origin
+  // Coleta registros e dispara em sequência com delay
+  var popQueue = [];
+  var queueRunning = false;
+
+  function runQueue() {
+    if (queueRunning || popQueue.length === 0) return;
+    queueRunning = true;
+
+    function next() {
+      if (popQueue.length === 0) {
+        queueRunning = false;
+        return;
       }
-    });
+      var item = popQueue.shift();
+      item.source.postMessage({ type: 'pop_go', url: item.url }, '*');
+      console.log("%c[Pop] 📨 Disparando: " + item.title, "color: purple; font-weight: bold;");
+      setTimeout(next, 600); // 600ms entre cada pop
+    }
+
+    next();
   }
 
-  // Filho: recebe sinal do pai e abre o seu popup
-  if (isIframe && isSameOrigin) {
-    window.addEventListener('message', function (e) {
-      if (e.data && e.data.type === 'pop_pai_disparado' && waitingForParent) {
-        waitingForParent = false;
-        window.open(e.data.url, "_blank");
-        console.log("%c[Pop] 🚀 Filho disparado após pai | " + pageTitle, "color: cyan; font-weight: bold;");
+  window.addEventListener('message', function (e) {
+    if (!e.data) return;
+
+    // Topo recebe registros dos filhos e enfileira
+    if (e.data.type === 'pop_register') {
+      popQueue.push({ source: e.source, url: e.data.url, title: e.data.title });
+      console.log("%c[Pop] 📥 Registrado: " + e.data.title, "color: yellow; font-weight: bold;");
+
+      // Aguarda 100ms para coletar todos antes de disparar
+      if (!queueRunning) {
+        setTimeout(runQueue, 100);
       }
-    });
-  }
+    }
+
+    // Filho recebe sinal para disparar
+    if (e.data.type === 'pop_go' && waitingForRoot) {
+      waitingForRoot = false;
+      window.open(e.data.url, "_blank");
+      console.log("%c[Pop] 🚀 Disparado pela fila | " + pageTitle, "color: cyan; font-weight: bold;");
+    }
+  });
 
   document.addEventListener('mousedown', openPop, { once: true });
   document.addEventListener('touchstart', openPop, { once: true, passive: true });
