@@ -1,47 +1,30 @@
-(function () {
-  var ENABLED = true;
-  var URL_POP = "https://crn77.com/4/8868046";
-  var pageTitle = document.title || window.location.href;
+const POPUP_ENABLED = true;
+let popupLoaded = false;
 
-  if (ENABLED) {
-    console.log("%c[Pop] âœ… Ativado | PÃ¡gina: " + pageTitle, "color: green; font-weight: bold;");
-  } else {
-    console.log("%c[Pop] âŒ Desativado | PÃ¡gina: " + pageTitle, "color: red; font-weight: bold;");
+function loadPopup() {
+  const pageTitle = document.title || '(sem título)';
+  const pageUrl = window.location.href;
+
+  if (!POPUP_ENABLED) {
+    console.log(`[Popup] Desativado via configuração. | Página: "${pageTitle}" | URL: ${pageUrl}`);
+    return;
   }
 
-  if (!ENABLED) return;
+  if (popupLoaded) return;
 
-  function init() {
-    var popupLoaded = false;
+  const script = document.createElement('script');
+  script.src = "https://pl29321559.profitablecpmratenetwork.com/ef/89/59/ef8959a132a6099f02e3f1b4146e32ab.js";
 
-    var overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:9999;';
-    document.body.appendChild(overlay);
+  script.onload = function () {
+    console.log(`[Popup] Carregado com sucesso. | Página: "${pageTitle}" | URL: ${pageUrl}`);
+    popupLoaded = true;
+  };
 
-    function onTouch() {
-      if (popupLoaded) return;
-      popupLoaded = true;
+  script.onerror = function () {
+    console.error(`[Popup] Erro ao carregar o script. | Página: "${pageTitle}" | URL: ${pageUrl}`);
+  };
 
-      overlay.style.pointerEvents = 'none';
-      window.open(URL_POP, "_blank");
-      console.log("%c[Pop] ðŸš€ Disparado | " + pageTitle, "color: cyan; font-weight: bold;");
+  document.head.appendChild(script);
+}
 
-      setTimeout(() => {
-        popupLoaded = false;
-        overlay.style.pointerEvents = 'auto';
-        console.log("%c[Pop] ðŸ”„ Reativado | " + pageTitle, "color: green; font-weight: bold;");
-      }, 15000);
-    }
-
-    overlay.addEventListener('mousedown', onTouch);
-    overlay.addEventListener('touchend', onTouch, { passive: true });
-  }
-
-  // Aguarda o DOM estar pronto
-  if (document.body) {
-    init();
-  } else {
-    document.addEventListener('DOMContentLoaded', init);
-  }
-
-})();
+loadPopup();
