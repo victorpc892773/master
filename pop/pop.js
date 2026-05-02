@@ -1,6 +1,6 @@
 (function () {
   var ENABLED = true;
-  var URL_POP = "https://crn77.com/4/8868046";
+  var URL_POP = "https://www.profitablecpmratenetwork.com/enr63z73?key=670042a3760e98ee818c2add5affbf67";
   var pageTitle = document.title || window.location.href;
 
   // ─── Estilos do console ───────────────────────────────────────────────────
