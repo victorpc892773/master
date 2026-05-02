@@ -1,12 +1,18 @@
 function criarOverlay() {
-  var existente = document.getElementById('_pop_overlay');
-  if (existente) existente.remove();
+  var attr = '_pop_ov_' + Math.random().toString(36).slice(2);
+
+  // Remove apenas overlays do próprio pop
+  document.querySelectorAll('[data-pop-overlay]').forEach(function(el) {
+    el.remove();
+  });
 
   var overlay = document.createElement('div');
-  overlay.id = '_pop_overlay';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483647;cursor:pointer;background:transparent;';
+  overlay.setAttribute('data-pop-overlay', attr);
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483647;cursor:pointer;background:transparent;pointer-events:auto;';
 
   overlay.addEventListener('click', function() {
+    // Desativa ponteiro imediatamente para não interferir
+    overlay.style.pointerEvents = 'none';
     overlay.remove();
 
     var s = document.createElement('script');
