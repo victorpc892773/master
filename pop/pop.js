@@ -1,5 +1,5 @@
 (function () {
-  var ENABLED = true;
+  var ENABLED = false;
   var URL_POP = "https://www.profitablecpmratenetwork.com/enr63z73?key=670042a3760e98ee818c2add5affbf67";
   var pageTitle = document.title || window.location.href;
 
